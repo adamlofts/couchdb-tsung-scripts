@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<!DOCTYPE tsung SYSTEM "/usr/share/tsung/tsung-1.0.dtd">
+<tsung loglevel="notice" version="1.0">
+
+  <!-- Client side setup -->
+  <clients>
+    <client host="localhost" use_controller_vm="true"/>
+  </clients>
+  
+  <!-- Server side setup -->
+  <servers>
+    <server host="localhost" port="5984" type="tcp"></server>
+  </servers>
+
+  <!-- to start os monitoring (cpu, network, memory). Use an erlang
+  agent on the remote machine or SNMP. erlang is the default --> 
+<!--  <monitoring>
+    <monitor host="localhost"></monitor>
+  </monitoring> -->
+  
+  <load>
+  <!-- several arrival phases can be set: for each phase, you can set
+  the mean inter-arrival time between new clients and the phase
+  duration -->
+   <arrivalphase phase="1" duration="30" unit="second">
+     <users interarrival="2" unit="second"></users>
+   </arrivalphase>
+  </load>
+
+  <options>
+   <option type="ts_http" name="user_agent">
+    <user_agent probability="100">Mozilla/5.0 (X11; U; Linux i686; en-US; rv:1.7.8) Gecko/20050513 Galeon/1.3.21</user_agent>
+    </option>
+  </options>
+
+ <sessions>
+  <session name="http-example" probability="100" type="ts_http">
+    
+    <request subst="true"><http url='/db3_id_%%ts_user_server:get_unique_id%%/' version='1.1' content_type='application/json' method='PUT'></http></request>
+
+     <for from="1" to="1000" incr="1" var="counter">
+        <request subst="true"><http url="/db3_id_%%ts_user_server:get_unique_id%%/doc_%%_counter%%" version="1.1" contents='{&quot;_id&quot;:&quot;doc_%%_counter%%&quot;}' content_type='application/json' method='PUT'></http></request>
+    </for>
+
+    <request subst="true"><http url='/db3_id_%%ts_user_server:get_unique_id%%/' version='1.1' content_type='application/json' method='DELETE'></http></request>
+  </session>
+ </sessions>
+</tsung>
+
